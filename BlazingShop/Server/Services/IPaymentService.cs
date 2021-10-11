@@ -1,4 +1,5 @@
 ﻿using BlazingShop.Shared;
+using Microsoft.Extensions.Configuration;
 using Stripe;
 using Stripe.Checkout;
 using System;
@@ -15,9 +16,9 @@ namespace BlazingShop.Server.Services
 
     public class PaymentService : IPaymentService
     {
-        public PaymentService()
+        public PaymentService(IConfiguration config)
         {
-            StripeConfiguration.ApiKey = "sk_test_51JjU4SATGV5VFVw1vjPVFQtPfd1XN4qGxmIb74IEbtsXt8CtEh1LqppEOAa5My5SaNsQcjb99uN9VFJBpZndwVYA00kdzURSiw";
+            StripeConfiguration.ApiKey = config.GetSection("StripeId").Value;
         }
 
         public Session CreateCheckoutSession(List<CartItem> cartItems)
