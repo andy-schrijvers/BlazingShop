@@ -38,5 +38,10 @@ namespace BlazingShop.Client.Service
                 Products = await _http.GetFromJsonAsync<List<Product>>($"/api/product/category/{categoryUrl}");
             }
         }
+
+        public async Task<List<Product>> SearhProductsAsync(string searchText)
+        {
+            return await _http.GetFromJsonAsync<List<Product>>($"api/product/search/{searchText}");
+        }
     }
 }

@@ -21,21 +21,27 @@ namespace BlazingShop.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetProducts()
+        public async Task<ActionResult<List<Product>>> GetProductsAsync()
         {
             return Ok(await _productService.GetAllProductsAsync());
         }
 
         [HttpGet("category/{categoryUrl}")]
-        public async Task<ActionResult<List<Product>>> GetProducts([FromRoute] string categoryUrl)
+        public async Task<ActionResult<List<Product>>> GetProductsAsync([FromRoute] string categoryUrl)
         {
             return Ok(await _productService.GetProductsByCategoryUrlAsync(categoryUrl));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<Product>>> GetProducts([FromRoute] int id)
+        public async Task<ActionResult<List<Product>>> GetProductsAsync([FromRoute] int id)
         {
             return Ok(await _productService.GetProductAsync(id));
+        }
+
+        [HttpGet("search/{searchText}")]
+        public async Task<ActionResult<List<Product>>> SearchProductsAsync([FromRoute]string searchText)
+        {
+            return Ok(await _productService.SearchProductsAsync(searchText));
         }
 
     }

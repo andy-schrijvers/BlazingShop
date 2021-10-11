@@ -76,7 +76,7 @@ else
 
     private Edition SelectectedEdition { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         CurrentProduct = await ProductService.GetProductByIdAsync(ProductId);
 

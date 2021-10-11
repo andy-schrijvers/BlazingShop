@@ -49,5 +49,12 @@ namespace BlazingShop.Server.Services
                 .Include(p => p.ProductVariants)
                 .Where(p => p.CategoryId == category.CategoryId).ToListAsync();
         }
+
+        public async Task<List<Product>> SearchProductsAsync(string searchText)
+        {
+            return await _data.Products
+                .Where(p => p.Title.Contains(searchText) || p.Description.Contains(searchText))
+                .ToListAsync();
+        }
     }
 }

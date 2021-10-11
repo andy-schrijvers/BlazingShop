@@ -9,5 +9,6 @@ namespace BlazingShop.Server.Services
         Task<List<Product>> GetAllProductsAsync();
         Task<List<Product>> GetProductsByCategoryUrlAsync(string categoryUrl);
         Task<Product> GetProductAsync(int productId);
+        Task<List<Product>> SearchProductsAsync(string searchText);
     }
 }

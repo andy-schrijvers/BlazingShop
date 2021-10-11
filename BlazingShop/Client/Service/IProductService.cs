@@ -13,5 +13,6 @@ namespace BlazingShop.Client.Service
         Task LoadProductsAsync(string categoryUrl = null);
 
         Task<Product> GetProductByIdAsync(int id);
+        Task<List<Product>> SearhProductsAsync(string searchText);
     }
 }

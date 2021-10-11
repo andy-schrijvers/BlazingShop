@@ -1,8 +1,29 @@
 ﻿
 @inject ISyncLocalStorageService SyncLocalStorage
 @inject ICartService CartService
+@inject IProductService ProductService
+@inject NavigationManager NavManager
 @implements IDisposable
 
+
+<BlazoredTypeahead SearchMethod="@SearchProduct"
+                   TValue="Product"
+                   TItem="Product"
+                   Value="SelectedProduct"
+                   ValueChanged="HandleSearch"
+                   ValueExpression="@(() => SelectedProduct)"
+                   Debounce="500"
+                   placeholder="Search...">
+    <SelectedTemplate>
+        @context.Title
+    </SelectedTemplate>
+    <ResultTemplate>
+        @context.Title
+    </ResultTemplate>
+    <NotFoundTemplate>
+        Sorry, there weren 't any products found!
+    </NotFoundTemplate>
+</BlazoredTypeahead>
 <a href="cart" class="btn btn-info">
     <i class="oi oi-cart"></i>
     Cart
@@ -10,6 +31,8 @@
 </a>
 
 @code {
+
+    private Product SelectedProduct;
 
     public int Counter { get; set; }
 
@@ -30,6 +53,22 @@
     public void Dispose()
     {
         CartService.OnChange -= StateHasChanged;
+    }
+
+    private async Task<IEnumerable<Product>> SearchProduct(string searchText)
+    {
+        return await ProductService.SearhProductsAsync(searchText);
+    }
+
+    private void HandleSearch(Product product)
+    {
+        if (product == null)
+        {
+            return;
+        }
+
+        SelectedProduct = product;
+        NavManager.NavigateTo($"product/{SelectedProduct.ProductId}");
     }
 
 }
