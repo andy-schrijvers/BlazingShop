@@ -14,7 +14,7 @@
 else
 {
     <div class="views">
-        <i class="oi oi-eye"></i> @CurrentProduct.Views.ToString("0##")
+        <i class="oi oi-eye"></i> @GetViewString()
     </div>
     <div class="media">
         <div class="media-img-big-wrapper mr-2">
@@ -49,7 +49,11 @@ else
                     € @GetSelectedVariant().Price
                 </h4>
             }
-
+            <EditForm Model="CartItem">
+                <div class="form-group cart-item">
+                    <InputNumber id="quantity" @bind-Value="CartItem.Quantity" class="form-control"/>
+                </div>
+            </EditForm>
 
             <button class="btn btn-primary" @onclick="AddToCart"><i class="oi oi-cart"></i>&nbsp;&nbsp;&nbsp;Add to Cart</button>
         </div>
@@ -67,6 +71,8 @@ else
     private Product CurrentProduct;
 
     private int CurrentEditionId = 1;
+
+    private CartItem CartItem = new CartItem() { Quantity = 1 };
 
     private Edition SelectectedEdition { get; set; }
 
@@ -90,7 +96,35 @@ else
 
     private async Task AddToCart()
     {
-        await CartService.AddToCartAsync(GetSelectedVariant());
+        var productVariant = GetSelectedVariant();
+        CartItem.EditionId = productVariant.EditionId;
+        CartItem.EditionName = productVariant.Edition.Name;
+        CartItem.Image = CurrentProduct.Image;
+        CartItem.Price = productVariant.Price;
+        CartItem.ProductId = productVariant.ProductId;
+        CartItem.ProductTitle = CurrentProduct.Title;
+
+        await CartService.AddToCartAsync(CartItem);
+    }
+
+    private string GetViewString()
+    {
+        if (CurrentProduct.Views > 1000000)
+        {
+            return $"{((float)CurrentProduct.Views / 1000000).ToString("#.##")}M";
+        }
+
+        if (CurrentProduct.Views > 100000)
+        {
+            return $"{((float)CurrentProduct.Views / 1000).ToString("#")}K";
+        }
+
+        if (CurrentProduct.Views > 1000)
+        {
+            return $"{((float)CurrentProduct.Views / 1000).ToString("#.##")}K";
+        }
+
+        return CurrentProduct.Views.ToString("0##");
     }
 
 

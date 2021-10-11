@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Blazored.Toast;
-using BlazingShop.Client.CartServices;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazingShop.Client

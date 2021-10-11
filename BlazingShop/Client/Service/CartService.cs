@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BlazingShop.Client.CartServices
+namespace BlazingShop.Client.Service
 {
     public class CartService : ICartService
     {
@@ -23,19 +23,32 @@ namespace BlazingShop.Client.CartServices
             _productService = productService;
         }
 
-        public async Task AddToCartAsync(ProductVariant productVariant)
+        public async Task AddToCartAsync(CartItem cartItem)
         {
-            var cart = await _localStorage.GetItemAsync<List<ProductVariant>>("cart");
+            var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
 
             if (cart == null)
             {
-                cart = new List<ProductVariant>();
+                cart = new List<CartItem>();
             }
 
-            cart.Add(productVariant);
+            var sameItem = cart
+                .Find(x => x.ProductId == cartItem.ProductId && x.EditionId == cartItem.EditionId);
+
+            if (sameItem == null)
+            {
+                cart.Add(cartItem);
+            }
+
+            else
+            {
+                sameItem.Quantity += cartItem.Quantity;
+            }
+
             await _localStorage.SetItemAsync("cart", cart);
 
-            var product = await _productService.GetProductByIdAsync(productVariant.ProductId);
+
+            var product = await _productService.GetProductByIdAsync(cartItem.ProductId);
             _toestService.ShowSuccess(product.Title, "Added to cart");
 
             OnChange?.Invoke();
@@ -43,41 +56,20 @@ namespace BlazingShop.Client.CartServices
 
         public async Task<List<CartItem>> GetCartItemsAsync()
         {
-            var result = new List<CartItem>();
-            var cart = await _localStorage.GetItemAsync<List<ProductVariant>>("cart");
+
+            var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
 
             if (cart == null)
             {
-                return result;
+                return new List<CartItem>();
             }
 
-            foreach (var item in cart)
-            {
-                var product = await _productService.GetProductByIdAsync(item.ProductId);
-                var cartItem = new CartItem()
-                {
-                    ProductId = product.ProductId,
-                    ProductTitle = product.Title,
-                    Image = product.Image,
-                    EditionId = item.EditionId
-                };
-
-                var variant = product.ProductVariants.Find(v => v.EditionId == item.EditionId);
-                if (variant != null)
-                {
-                    cartItem.EditionName = variant.Edition?.Name;
-                    cartItem.Price = variant.Price;
-                }
-
-                result.Add(cartItem);
-            }
-
-            return result;
+            return cart;
         }
 
         public async Task DeleteItemAsync(CartItem item)
         {
-            var cart = await _localStorage.GetItemAsync<List<ProductVariant>>("cart");
+            var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
             if (cart == null)
             {
                 return;
@@ -87,6 +79,12 @@ namespace BlazingShop.Client.CartServices
             cart.Remove(cartItem);
 
             await _localStorage.SetItemAsync("cart", cart);
+            OnChange?.Invoke();
+        }
+
+        public async Task EmptyCart()
+        {
+            await _localStorage.RemoveItemAsync("cart");
             OnChange?.Invoke();
         }
     }

@@ -2,18 +2,62 @@
 @inject ICartService CartService
 
 
+
+
+@if (!orderPlaced)
+{
     <h3>Shopping Cart</h3>
 
-@if (CartItems == null || CartItems.Count() <= 0)
-{
-    <span>You have no items in your cart.</span>
+    @if (CartItems == null || CartItems.Count() <= 0)
+    {
+        <span>You have no items in your cart.</span>
+    }
+
+    else
+    {
+        <div>
+            @foreach (var item in CartItems)
+            {
+                <div class="item-container">
+                    <div class="item-image-wrapper">
+                        <img src="@item.Image" class="item-image" />
+                    </div>
+                    <div class="item-name">
+                        <h5><a href="/product/@item.ProductId">@item.ProductTitle</a></h5>
+                        <span>@item.EditionName</span>
+                        <br />
+                        <button class="btn-delete" @onclick="@(() => DeleteItem(item))">Delete</button>
+                        <EditForm Model="item">
+                            <div class="form-group item-quantity">
+                                <InputNumber id="quantity" @bind-Value="item.Quantity" class="form-control" />
+                            </div>                         
+                        </EditForm>
+                    </div>
+                </div>
+                <div class="item-price">
+                    € @(item.Price * item.Quantity)
+                    <hr />
+                </div>
+            }
+            <div class="item-price">
+                Total (@CartItems.Count): € @CartItems.Sum(item => item.Price * item.Quantity)
+            </div>
+            <div class="cart-order">
+                <button class="btn-primary btn-lg" @onclick="PlaceOrder">Place Order</button>
+            </div>
+        </div>
+    }
+
+
 }
 
 else
 {
-    <div>
-        @foreach (var item in CartItems)
-        {
+    <h3>Thank you for your order!</h3>
+    <h4>Here's what you get</h4>
+
+    @foreach (var item in CartItems)
+    {
         <div class="item-container">
             <div class="item-image-wrapper">
                 <img src="@item.Image" class="item-image" />
@@ -21,24 +65,31 @@ else
             <div class="item-name">
                 <h5><a href="/product/@item.ProductId">@item.ProductTitle</a></h5>
                 <span>@item.EditionName</span>
-                <br/>
-                <button class="btn-delete" @onclick="@(() => DeleteItem(item))">Delete</button>
-            </div>      
-        </div>
-            <div class="item-price">
-                € @item.Price
-                <hr/>
             </div>
-        }
-        <div class="item-price">
-            Total (@CartItems.Count): € @CartItems.Sum(c => c.Price)
         </div>
+        <div class="item-price">
+            € @(item.Price * item.Quantity)
+            <hr />
+        </div>
+    }
+
+    <div class="item-price">
+        Total (@CartItems.Count): € @CartItems.Sum(item => item.Price * item.Quantity)
     </div>
 }
+
+
+
+
+
+
+
 
 @code {
 
     List<CartItem> CartItems = new List<CartItem>();
+
+    private bool orderPlaced = false;
 
     protected async override Task OnInitializedAsync()
     {
@@ -50,4 +101,11 @@ else
         await CartService.DeleteItemAsync(item);
         CartItems = await CartService.GetCartItemsAsync();
     }
+
+    private async Task PlaceOrder()
+    {
+        orderPlaced = true;
+        await CartService.EmptyCart();
+    }
+
 }

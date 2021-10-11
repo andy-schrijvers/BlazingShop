@@ -39,3 +39,10 @@ padding: 6px;
 .btn-delete:hover{
     text-decoration: underline;
 }
+
+
+.item-quantity {
+    width: 70px;
+    text-align: center;
+    margin-top: 10px;
+}
