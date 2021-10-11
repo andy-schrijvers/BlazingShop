@@ -1,0 +1,94 @@
+﻿
+@page "/product/{ProductId:int}"
+@inject IProductService ProductService
+@inject ILocalStorageService LocalStorageService
+@inject IToastService ToastService
+@inject ICartService CartService
+
+
+@if (CurrentProduct == null)
+{
+    <LoadingSpinner/>
+}
+
+else
+{
+    <div class="media">
+        <div class="media-img-big-wrapper mr-2">
+            <img class="media-img-big" src="@CurrentProduct.Image" alt="@CurrentProduct.Title" />
+        </div>
+        <div class="media-body">
+            <h2 class="mb-0">@CurrentProduct.Title</h2>
+            <p>@CurrentProduct.Description</p>
+            @if (CurrentProduct.ProductVariants != null && CurrentProduct.ProductVariants.Count() > 1)
+            {
+                <EditForm Model="CurrentProduct">
+                    <div class="form-group">
+                        <CustomSelect @bind-Value="@CurrentEditionId" class="form-control">
+                            @foreach (var variants in CurrentProduct.ProductVariants)
+                             {
+                                <option value="@variants.EditionId">@variants.Edition.Name</option>
+                             }
+                        </CustomSelect>
+                    </div>
+                </EditForm>
+            }
+
+            @if (GetSelectedVariant() != null)
+            {
+                @if (GetSelectedVariant().OriginalPrice > GetSelectedVariant().Price)
+                {
+                    <h6 class="text-muted original-price">
+                        € @GetSelectedVariant().OriginalPrice
+                    </h6>
+                }
+                <h4 class="price">
+                    € @GetSelectedVariant().Price
+                </h4>
+            }
+
+
+            <button class="btn btn-primary" @onclick="AddToCart"><i class="oi oi-cart"></i>&nbsp;&nbsp;&nbsp;Add to Cart</button>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private Product CurrentProduct;
+
+    private int CurrentEditionId = 1;
+
+    private Edition SelectectedEdition { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentProduct = await ProductService.GetProductByIdAsync(ProductId);
+
+        if (CurrentProduct.ProductVariants.Count() > 0)
+        {
+            CurrentEditionId = CurrentProduct.ProductVariants[0].EditionId;
+        }
+    }
+
+    private ProductVariant GetSelectedVariant()
+    {
+        var variant = CurrentProduct.ProductVariants.FirstOrDefault(v => v.EditionId == CurrentEditionId);
+
+        return variant;
+    }
+
+
+    private async Task AddToCart()
+    {
+        await CartService.AddToCartAsync(GetSelectedVariant());
+    }
+
+
+}

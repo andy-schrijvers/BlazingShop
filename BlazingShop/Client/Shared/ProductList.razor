@@ -1,0 +1,56 @@
+﻿
+@inject IProductService ProductService
+
+
+
+    <ul class="list-unstyled">
+        @foreach (var p in ProductService.Products)
+        {
+            <li class="media my-3">
+                <div class="media-img-wrapper mr-2">
+                    <a href="/product/@p.ProductId">
+                        <img class="media-img" src="@p.Image" alt="@p.Title" />
+                    </a>
+                </div>
+                <div class="media-body">
+                    <a href="/product/@p.ProductId">
+                        <h4 class="mb-0">
+                            @p.Title
+                        </h4>
+                    </a>
+                    <p>@p.Description</p>
+
+                    <h5 class="price">
+                        @GetPriceText(p)
+                    </h5>
+                </div>
+            </li>
+        }
+    </ul>
+
+
+
+@code {
+
+    [Parameter]
+    public EventCallback Change { get; set; }
+
+    private string GetPriceText(Product p)
+    {
+        var variants = p.ProductVariants;
+        if (variants.Count() == 0)
+        {
+            return string.Empty;
+        }
+
+        else if(variants.Count() == 1)
+        {
+            return $"€ {variants[0].Price}";
+        }
+
+        decimal minPrice = variants.Min(v => v.Price);
+
+        return $"Starting at € {minPrice}";
+    }
+
+}
