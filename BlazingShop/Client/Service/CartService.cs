@@ -4,6 +4,8 @@ using Blazored.LocalStorage;
 using Blazored.Toast.Services;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace BlazingShop.Client.Service
@@ -13,14 +15,16 @@ namespace BlazingShop.Client.Service
         private readonly ILocalStorageService _localStorage;
         private readonly IToastService _toestService;
         private readonly IProductService _productService;
+        private readonly HttpClient _http;
 
         public event Action OnChange;
 
-        public CartService(ILocalStorageService localStorage, IToastService toestService, IProductService productService)
+        public CartService(ILocalStorageService localStorage, IToastService toestService, IProductService productService, HttpClient http)
         {
             _localStorage = localStorage;
             _toestService = toestService;
             _productService = productService;
+           _http = http;
         }
 
         public async Task AddToCartAsync(CartItem cartItem)
@@ -86,6 +90,13 @@ namespace BlazingShop.Client.Service
         {
             await _localStorage.RemoveItemAsync("cart");
             OnChange?.Invoke();
+        }
+
+        public async Task<string> Checkout()
+        {
+            var result = await _http.PostAsJsonAsync("/api/payment/checkout", await GetCartItemsAsync());
+            var url = await result.Content.ReadAsStringAsync();
+            return url;
         }
     }
 }

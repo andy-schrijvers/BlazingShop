@@ -38,6 +38,7 @@ namespace BlazingShop.Server
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IStatsService, StatsService>();
+            services.AddScoped<IPaymentService, PaymentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

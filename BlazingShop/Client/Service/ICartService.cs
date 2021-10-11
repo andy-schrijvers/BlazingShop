@@ -13,5 +13,6 @@ namespace BlazingShop.Client.Service
         Task<List<CartItem>> GetCartItemsAsync();
         Task DeleteItemAsync(CartItem item);
         Task EmptyCart();
+        Task<string> Checkout();
     }
 }
