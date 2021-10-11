@@ -2,6 +2,7 @@
 @page "/{CategoryUrl}"
 @inject ICategoryService CategoryService
 @inject IProductService ProductService
+@inject ILocalStorageService LocalStorageService
 
 
 
@@ -13,16 +14,30 @@
 
     else
     {
-        <h1>Welcome to Blazing Shop!</h1>
-
-
+        
+        <AuthorizeView>
+            <Authorized>
+                <h1>Welcome back, @username !</h1>
+            </Authorized>
+            <NotAuthorized>
+                <h1>Welcome to Blazing Shop!</h1>
+            </NotAuthorized>
+        </AuthorizeView>
+       
     }
 
     <ProductList Change="OnChange" />
 
 
 
-@code{
+@code{        
+
+    string username = "";
+    protected async override Task OnInitializedAsync()
+    {
+        username = await LocalStorageService.GetItemAsync<string>("username");
+    }
+
 
     [Parameter]
     public string CategoryUrl { get; set; }
@@ -47,5 +62,6 @@
     {
         await ProductService.LoadProductsAsync();
     }
+
 
 }
