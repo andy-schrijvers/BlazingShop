@@ -18,6 +18,8 @@ namespace BlazingShop.Server.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Edition> Editions { get; set; }
         public DbSet<ProductVariant> productVariants { get; set; }
+        public DbSet<Stats> Stats { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -34,6 +34,8 @@ namespace BlazingShop.Client
             builder.Services.AddAuthorizationCore();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
+            builder.Services.AddScoped<IStatsService, StatsService>();
+
             await builder.Build().RunAsync();
         }
     }

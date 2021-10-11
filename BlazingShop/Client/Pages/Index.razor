@@ -3,6 +3,7 @@
 @inject ICategoryService CategoryService
 @inject IProductService ProductService
 @inject ILocalStorageService LocalStorageService
+@inject IStatsService StatsService
 
 
 
@@ -56,6 +57,9 @@
         {
             Category = null;
         }
+
+        await StatsService.IncrementVisitsAsync();
+        await StatsService.GetVisitsAsync();
     }
 
     public async Task OnChange()
